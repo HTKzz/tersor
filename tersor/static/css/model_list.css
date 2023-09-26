@@ -1,0 +1,122 @@
+@charset "utf-8";
+@import url(//fonts.googleapis.com/earlyaccess/nanumgothic.css);
+@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family:'Noto Sans KR', sans-serif;
+    text-decoration: none;
+}
+
+body {
+    min-width: 1355px;
+    color:#555;
+}
+
+td {
+    width: 300px;
+    height: 200px;
+    border:2px solid black;
+    margin: 10px;
+    box-shadow: 2px 2px 1px rgba(0,0,0,.15);
+}
+
+.tb_list {
+    width: 1000px;
+    height: 1000px;
+    margin: 0 auto;
+}
+
+.tb_list table {
+    margin: 0 auto;
+}
+
+.tb_list table {
+    border-spacing: 10px;
+    border-collapse: separate;
+}
+
+.desc > h1 {
+    font-size: 17px;
+    font-weight: 1000;
+    color: #333;
+    height: 33px;
+    text-align: left;
+}
+
+.desc > h3 {
+    text-align: left;
+    font-size: 15px;
+}
+
+.desc {
+    height: 100%;
+    padding: 10px;
+}
+
+.desc .imgCon {
+    height: 50%;
+}
+
+.desc .imgCon img {
+    margin-top: 20px;
+}
+
+/* 팝업 */
+.dpNone {
+    border: 1px solid black;
+    /* border-radius: 20px; */
+    display: none;
+    position: fixed;
+    width: 736px;
+    height: 504px;
+    z-index: 10;
+    margin: 0 auto;
+    left: -7px;
+    right: 0;
+    top: 153px;
+    background-color: white;
+}
+
+.tb_list td > div > div {
+    width: 90%;
+    height: 50px;
+    margin: 0 auto;
+}
+
+.dpNone h2 {
+    width: 90%;
+    margin-top: 25px;
+    display: inline-block;
+    text-align: left;
+}
+
+.dpNone button {
+    width: 30px;
+    height: 30px;
+    margin-top: 18px;
+    float: right;
+    font-size: 30px;
+    font-weight: bold;
+    border: 0;
+}
+
+.dpNone pre {
+    margin: 0 auto;
+    margin-top: 30px;
+    height: 70%;
+    padding: 0px 40px;
+    text-align: left;
+}
+
+.dpNone a {
+    display: block;
+    width: 100px;
+    height: 33px;
+    color: #fff;
+    background: #005596;
+    border: 0;
+    text-align: center;
+    line-height: 30px;
+}

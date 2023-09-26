@@ -1,0 +1,92 @@
+{% load static %}
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Model App</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="{% static '/css/result_form.css' %}">
+    </head>
+    <body>
+        <div id="hiddenContainer">
+            <input type="hidden" id="apiName" name="apiName" value="{{model.apiName}}">
+            <input type="hidden" id="imageAmount" name="imageAmount" value="{{imageAmount}}">
+            <input type="hidden" id="imageCode0" name="imageCode0" value="{{encoded0}}">
+            <input type="hidden" id="imageCode1" name="imageCode1" value="{{encoded1}}">
+            <input type="hidden" id="imageCode2" name="imageCode2" value="{{encoded2}}">
+            <input type="hidden" id="graphCode" name="graphCode" value="{{graph}}">
+        </div>
+        <div>
+            {% if y %}
+                <p>대입값 : {{x}}</p>
+                <p>{{y}}</p>
+                {% if z %}
+                <div id="imageContainer">
+                    <h2>이미지</h2>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+
+    </body>
+
+    <script>
+        $(document).ready(function() {
+            const apiName = document.getElementById("apiName").value
+            const imageAmount = document.getElementById("imageAmount").value
+
+            // 이미지 부분
+            if (apiName == 'model1') {
+                // const graphCode = document.getElementById("graphCode").value
+                const imageContainerElement = document.getElementById("imageContainer")
+
+                var image = "<table><tr>"
+                for (var i = 0; i < imageAmount; i++) {
+                    const imageCode = document.getElementById("imageCode"+i).value
+                    image += "<td><img src='data:image/png;base64,"+imageCode+"'/></td>"
+                }
+                image += "</tr></table>"
+                imageContainerElement.innerHTML += image
+
+                // 그래프 코드
+                // var graph = "<td><img src='data:image/png;base64,"+graphCode+"'/></td>"
+
+                // var image = "<table><tr>"
+                // image += graph
+                // image += "</tr></table>"
+                // imageContainerElement.innerHTML += image
+            }
+
+            if (apiName == 'model2') {
+                const imageContainerElement = document.getElementById("imageContainer")
+
+                var image = "<table><tr>"
+                for (var i = 0; i < imageAmount; i++) {
+                    const imageCode = document.getElementById("imageCode"+i).value
+                    image += "<td><img style='width:700px; height:350px;' src='data:image/png;base64,"+imageCode+"'/></td>"
+                }
+                image += "</tr></table>"
+                imageContainerElement.innerHTML += image
+            }
+
+            if (apiName == 'model3') {
+                const imageContainerElement = document.getElementById("imageContainer")
+
+                var image = "<table><tr>{% for model in allModel %}"
+                image += "<td><p>{{model.api_id.title|escapejs}}</p></td>"
+                image += "<td><p>{{model.api_id.apiName|escapejs}}</p></td>"
+                image += "<td><p>{{model.tag|escapejs}}</p></td>"
+                image += "<td><p>{{model.value|escapejs}}</p></td></tr>"
+                image += "{% endfor %}</table>"
+                imageContainerElement.innerHTML += image
+            }
+    	})
+        
+        // 뒤로가기 버튼 클릭시 메인페이지 이동
+        window.onpageshow = function(event) {
+            if ( event.persisted || (window.performance && window.performance.navigation.type == 2)) {
+                window.parent.location.href="http://1.246.218.120:3300/ten/"
+            }
+        }
+    </script>
+</html>

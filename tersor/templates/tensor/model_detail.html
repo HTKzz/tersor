@@ -1,0 +1,166 @@
+{% load static %}
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Model App</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+        <link rel="stylesheet" type="text/css" href="{% static '/css/model_detail.css' %}">
+    </head>
+    <body>
+        <h1>
+            <a href="/ten/">홈으로 돌아가기</a>
+        </h1>
+        <div style="min-width: 1300px;">
+            <div style="margin: 0 auto; width: 1100px;">
+                {% include 'tensor/navbar.html' %}
+                <div id='container'>
+                    <div class="title_content">
+                        <h2 class="title">
+                            {{model.title}}
+                        </h2>
+                        <div>
+                            <a href="{% url 'model_update' pk=model.apiName %}">수정</a>
+                            <a href="{% url 'model_delete' pk=model.pk %}" id="delete_btn">삭제</a>
+                        </div>
+                    </div>
+                    <div id="wrap_content">
+                        <div class="wrap_itm">
+                            <div class="hd_itm">
+                                <h4 class="tit_itm">
+                                    {{model.apiName}}
+                                </h4>
+                            </div>
+                            <div class="cont_itm">
+                                {% if model.content %}
+                                    <pre style="margin-bottom: 20px;">{{model.content}}</pre>
+                                {% else %}
+                                    <pre style="margin-bottom: 20px;">내용입니다.</pre>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="wrap_itm">
+                            <div class="hd_itm">
+                                <div class="box_sch">
+                                    <form action="{% url 'tensor_Detail' pk=model.apiName %}" method="" enctype="multipart/form-data" id="formContainer" target="phaser_iframe">
+                                        <div id="wrap_criteria"></div>
+                                        <div id="wrap_btn"></div>
+                                    </form>
+                                </div>
+                                <iframe name="phaser_iframe" width="842" height="800" frameborder=0 framespacing=0 marginheight=0 marginwidth=0 scrolling=no vspace=0></iframe>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="hiddenContainer">
+                        <input type="hidden" id="apiName" name="apiName" value="{{model.apiName}}">
+                        <input type="hidden" id="tag" name="tag" value="{{inputValue.tag}}">
+                        <input type="hidden" id="value" name="value" value="{{inputValue.value}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        $(document).ready(function() {
+            const apiName = document.getElementById("apiName").value.replace(/ /g, '\\ ')
+            const tag = document.getElementById("tag").value
+            const value = document.getElementById("value").value
+            const containerElement = document.getElementById("formContainer")
+
+            // 현재 모델3은 text값 하나여서 get방식으로 api호출, 이미지가 들어가면 post방식으로 호출
+            if (apiName == 'model3') {
+                $("#formContainer").attr("method", "GET");
+            } else {
+                $("#formContainer").attr("method", "POST");
+                var el = "{{ csrf_token }}"
+                el = "<input type='hidden' name='csrfmiddlewaretoken' value=" + el + ">"
+                containerElement.innerHTML += el
+            }
+
+            const arr1 = tag.split(",");
+            const arr2 = value.split(",");
+
+            // text 인풋부터 개수대로 작성 후 file 인풋 개수대로 작성
+            var el = ""
+            for (var i = 0; i < arr1.length; i++) {
+                if (arr2[i] == 'text') {
+                    el += "<dl>"
+                    el += "<dt><label class='label'>"+ arr1[i] +"</label></dt>"
+                    el += "<dd><input type='text' id='input' class='input' name='"+ arr1[i] +"'></dd></dl>"
+                } 
+            }
+            for (var i = 0; i < arr1.length; i++) {
+                if (arr2[i] == 'image') {
+                    el += "<dl>"
+                    el += "<dt><label class='label'>"+ arr1[i] +"</label></dt>"
+                    el += "<dd><input type='file' class='imagefile' name='"+ arr1[i] +"' accept='image/gif, image/jpeg, image/png, image/bmp'></dd></dl>"
+                }
+            }
+            el += "</dl>"
+            document.getElementById("wrap_criteria").innerHTML += el
+
+            var el = "<button type='submit' id='btn'>확인</button>"
+            document.getElementById("wrap_btn").innerHTML += el
+
+            // 서브메뉴에 모델 리스트 출력
+            const list = document.getElementById("liList")
+            var el = "{% for model in allModel %}"
+            el += "<li><a href='/ten/{{model.api_id.apiName|escapejs}}/' id='{{model.api_id.apiName|escapejs}}'>{{model.api_id.title|escapejs}}</a></li>"
+            el += "{% endfor %}"
+
+            document.getElementById("liList").innerHTML += el
+
+            // 현재 모델명 색상 변경
+            document.querySelector('#'+apiName).style.color = '#005596'
+
+            // 첨부파일 확장자 및 용량 제한
+            $(".imagefile").on("change", function(){
+				var fileName = $(this).val().split("\\").pop()
+				var fileExt = fileName.substring(fileName.lastIndexOf(".")+1)
+				fileExt = fileExt.toLowerCase()
+				
+				if(fileExt != "jpg" && fileExt != "jpeg" && fileExt != "gif" && fileExt != "png" && fileExt != "bmp"){
+					alert("이미지 파일만 등록이 가능합니다.")
+					$(this).val("")
+					return false
+				}
+                
+                if (this.files && this.files[0]) {
+                    var maxSize = 5 * 1024 * 1024;
+                    var fileSize = this.files[0].size;
+
+                    if(fileSize > maxSize){
+                        alert("첨부파일 사이즈는 5MB 이내로 등록 가능합니다.");
+                        $(this).val('');
+                        return false;
+                    }
+                }
+			})
+
+            // 유효성 검사
+            document.getElementById('btn').onclick = function() {
+                var imgTagName = document.getElementsByClassName('imagefile')
+                var inputTagName = document.getElementsByClassName('input')
+
+                for (var i = 0; i < imgTagName.length; i++) {
+                    if (inputTagName[i].value == ''){
+                        alert("빈칸을 채워주세요.")
+                        return false
+                    }
+                    if (imgTagName[i].files[0] == undefined){
+                        alert("첨부파일이 비어있습니다.")
+                        return false
+                    }
+                }
+            }
+
+            // 삭제시 확인
+            document.getElementById('delete_btn').onclick = function() {
+                if(confirm("정말 삭제하시겠습니까?") == false) {
+                    return false;
+                }
+            }
+    	})
+    </script>
+</html>

@@ -1,0 +1,44 @@
+@charset "utf-8";
+@import url(//fonts.googleapis.com/earlyaccess/nanumgothic.css);
+@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family:'Noto Sans KR', sans-serif;
+    text-decoration: none;
+}
+
+*, :after, :before {
+    box-sizing: border-box;
+    vertical-align: top;
+}
+
+body {
+    font-size:14px;
+    line-height:1.6;
+    color:#555;
+}
+
+ul {
+    list-style: none;
+    list-style-image: none;
+}
+
+select, button {
+    cursor: pointer;
+}
+
+table img {
+    width: 350px;
+    height: 200px;
+}
+
+table, td {
+    border: 1px solid #000;
+    padding: 3px;
+}
+
+#imageContainer table {
+    margin: 0 auto;
+}

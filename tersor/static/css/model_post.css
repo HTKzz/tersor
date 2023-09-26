@@ -1,0 +1,166 @@
+@charset "utf-8";
+@import url(//fonts.googleapis.com/earlyaccess/nanumgothic.css);
+@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+* {
+    margin: 0px;
+    padding: 0px;
+    vertical-align: baseline;
+    box-sizing: border-box;
+    font-family:'Noto Sans KR', sans-serif;
+    text-decoration: none;
+}
+
+body {
+    min-width: 1355px;
+    color:#555;
+}
+
+p {
+    margin: 0 auto;
+    color: red;
+}
+
+button, input[type="button"] {
+    border: 1px solid #d9d8d8;
+    cursor: pointer;
+    width: 70px;
+    height: 26px;
+    background-color: #005596;
+    color: #fff;
+}
+
+.content_wrap {
+    width: 842px;
+    margin: 0 auto;
+}
+
+.content_top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: #ddd solid 1px;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+    padding: 20px 0;
+}
+
+.content_top h2 {
+    margin-left: 20px;
+    font-size: 35px;
+}
+
+.resp_form {
+    margin: 15px 0;
+}
+
+.content h5 {
+    position: relative;
+    font-size: 20px;
+    padding: 8px 0 8px 20px;
+    color: #545454;
+    clear: both;
+}
+
+.resp_form dl {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.resp_form dl dt {
+    width: 17%;
+    padding: 15px 20px;
+    margin-left: 15%;
+    font-size: 16px;
+}
+
+.resp_form dl dd {
+    position: relative;
+    background: #fff;
+    padding: 15px 10px 13px 10px;
+    font-size: 16px;
+    text-align: left;
+}
+
+.resp_input dl {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.resp_input dl dt {
+    width: 17%;
+    padding: 15px 20px;
+    margin-left: 15%;
+    font-size: 16px;
+}
+
+.resp_input dl dd {
+    position: relative;
+    background: #fff;
+    width: 450px;
+    padding: 15px 10px 13px 10px;
+    font-size: 16px;
+    text-align: left;
+    height: 54px;
+}
+
+.new_input {
+    height: 51px;
+}
+
+.tag {
+    display: inline-block;
+    width: 350px;
+    height: 25px;
+    padding: 6px 12px;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    vertical-align: middle;
+    color: #555;
+    background-color: #fff;
+    border: 1px solid #979797;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+.resp_input .tag {
+    width: 175px;
+}
+
+.submitBox {
+    text-align: center;
+}
+
+.delete_btn {
+    margin-left: 10px;
+}
+
+.resp_input input[type="button"] {
+    margin-left: 5px
+}
+
+.resp_form dl dd.full {
+    text-align: center;
+    width: 100%;
+}
+
+.form_style {
+    display: inline-block;
+    width: 90%;
+    height: 200px;
+    padding: 6px 12px;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    vertical-align: middle;
+    color: #555;
+    background-color: #fff;
+    border: 1px solid #979797;
+    box-sizing: border-box;
+    border-radius: 5px;
+}

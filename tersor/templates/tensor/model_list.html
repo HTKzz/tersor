@@ -1,0 +1,107 @@
+{% load static %}
+{% load mathfilters %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model App</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% static '/css/model_list.css' %}">
+    <script src="{% static 'js/test.js' %}"></script>
+</head>
+<body>
+    <h1>Model List</h1>
+    <h3><a href="{% url 'model_add' %}">모델 등록</a></h3>
+    <div class="tb_list">
+        <table>
+            {% for index, model in models %}
+                {% if index|divisibleby:"3" %}
+                    <tr align="center">
+                        <td class="{{model.apiName}} tb">
+                            <div class="desc">
+                                <div class="imgCon">
+                                    <img src="">
+                                </div>
+                                <h1>{{model.title}}</h1><br>
+                                <h3>{{model.apiName}}</h3>
+                            </div>
+                            <div id="{{model.apiName}}" class="dpNone">
+                                <div>
+                                    <h2>{{model.title}}</h2>
+                                    <button class="xButton">×</button>
+                                </div>
+                                <pre>{{model.content}}</pre>
+                                <a href="{% url 'model_detail' pk=model.apiName %}">자세히보기</a>
+                            </div>
+                        </td>
+                {% else %}
+                    {% if index|sub:1|divisibleby:"3" %}
+                        <td class="{{model.apiName}} tb">
+                            <div class="desc">
+                                <div class="imgCon">
+                                    <img src="">
+                                </div>
+                                <h1>{{model.title}}</h1><br>
+                                <h3>{{model.apiName}}</h3>
+                            </div>
+                            <div id="{{model.apiName}}" class="dpNone">
+                                <div>
+                                    <h2>{{model.title}}</h2>
+                                    <button class="xButton">×</button>
+                                </div>
+                                <pre>{{model.content}}</pre>
+                                <a href="{% url 'model_detail' pk=model.apiName %}">자세히보기</a>
+                            </div>
+                        </td>
+                    {% else %}
+                        <td class="{{model.apiName}} tb">
+                            <div class="desc">
+                                <div class="imgCon">
+                                    <img src="">
+                                </div>
+                                <h1>{{model.title}}</h1><br>
+                                <h3>{{model.apiName}}</h3>
+                            </div>
+                            <div id="{{model.apiName}}" class="dpNone">
+                                <div>
+                                    <h2>{{model.title}}</h2>
+                                    <button class="xButton">×</button>
+                                </div>
+                                <pre>{{model.content}}</pre>
+                                <a href="{% url 'model_detail' pk=model.apiName %}">자세히보기</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+</body>
+
+<script>
+    $(document).ready(function() {
+        var classNameSplit = ""
+
+        // x버튼 누르면 팝업창 닫기
+        $('.xButton').on('click', function(){
+            $("#"+classNameSplit).css("display", "none");
+
+            return false;
+        });
+
+        // td를 클릭하면 상세설명 띄우기, 띄운상태에서 다른 td누르면 기존 상세설명 닫기
+        $(".tb_list td").on('click', function(){
+            if (classNameSplit != "") {
+                document.querySelector('#'+classNameSplit).style.display = 'none'
+            }
+            var className = $(this).attr('class').split(' t')[0].replace(/ /g, '\\ ')
+            classNameSplit = className
+
+            document.querySelector('#'+className).style.display = 'block'
+        });
+    })
+</script>
+
+</html>

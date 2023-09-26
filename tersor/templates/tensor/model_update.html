@@ -1,0 +1,166 @@
+{% load static %}
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Model App</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="{% static '/css/model_post.css' %}">
+    </head>
+    <style>
+    </style>
+    <body>
+        <h1>
+            <a href="/ten/">홈으로 돌아가기</a>
+        </h1>
+        <div class="content_wrap">
+            <div class="content_top">
+                <h2>모델 수정</h2>
+            </div>
+            <div class="content">
+                <form action="{% url 'model_update' pk=model.apiName %}" method="POST" onsubmit="return false" id="frm">
+                    <input type="hidden" id="inputTotal" name="inputTotal" value="{{inputValue.value}}">
+                    <input type="hidden" id="inputTag" name="tagTotal" value="{{inputValue.tag}}">
+                    {% csrf_token %}
+                    <div class="board_list_wrap">
+                        <div class="resp_form">
+                            <h5>API정보</h5>
+                            <dl>
+                                <dt><label for="title">제목</label></dt>
+                                <dd><input type="text" class="tag" name="title" id="title" placeholder="제목을 입력하세요." value="{{model.title}}"></dd><br>
+                                <dt><label for="apiName">API이름</label></dt>
+                                <dd><input type="text" class="tag" name="apiName" id="apiName" placeholder="API이름을 입력하세요." value="{{model.apiName}}"></dd>
+                                {% if text %}
+                                    <p>{{text}}</p>
+                                {% endif %}
+                            </dl>
+                            <div class="resp_input">
+                                <dl>
+                                    <dt>
+                                        <label for="parameter">파라미터</label>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="tag" name="tag" id="tag">
+                                        <label for="text">텍스트</label>
+                                        <input type="radio" class="input" name="input" value="text" checked>
+                                        <label for="image">이미지</label>
+                                        <input type="radio" class="input" name="input" value="image">
+                                        <input type="button" value="추가" onclick="addInput()">
+                                    </dd><br>
+                                </dl>
+                                <div id="prameterContainer"></div>
+                            </div>
+                            <h5>상세설명</h5>
+                            <dl>
+                                <dd class="full">
+                                    <textarea name="content" class="form_style" placeholder="상세내용을 입력하세요.">{{model.content}}</textarea>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </form>
+                <div class="submitBox">
+                    <button type="submit" id="btn">수정</button>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        var imgNum = 0
+
+        $(document).ready(function() {
+            const input = document.getElementById("inputTotal").value
+            const tag = document.getElementById("inputTag").value
+
+            var inputList = input.split(',')
+            var tagList = tag.split(',')
+
+            // 기존 모델 인풋 상태로 불러오기
+            for(var i = 0; i <tagList.length; i++) {
+                if(i == 0) {
+                    document.getElementById("tag").value = tagList[i]
+                    $("input[value="+ inputList[0] +"][type=radio]").attr("checked", "true")
+                } else {
+                    const prameterContainerElement = document.getElementById("prameterContainer")
+                    var el = "<div class='new_input'><dl><dt><label for='parameter'>파라미터 </label></dt>" +
+                                "<dd><input type='text' class='tag' name='tag' value='"+ tagList[i] +"'>" +
+                                "<label for='text'> 텍스트 </label>"
+
+                    if(inputList[i] == 'text') {
+                        el += "<input type='radio' class='input' name='input"+ imgNum +"' value='text' checked>" +
+                                "<label for='image'> 이미지 </label>" +
+                                "<input type='radio' class='input' name='input"+ imgNum +"' value='image'>"
+                    } else {
+                        el += "<input type='radio' class='input' name='input"+ imgNum +"' value='text'>" +
+                                "<label for='image'> 이미지 </label>" +
+                                "<input type='radio' class='input' name='input"+ imgNum +"' value='image' checked>"
+                    }
+
+                    el += "<button class='delete_btn'>삭제</button></dd></dl><br></div>"
+                    
+                    prameterContainerElement.innerHTML += el
+                    imgNum += 1
+                }
+            }
+
+            // 유효성 검사후 데이터 전송
+            document.getElementById('btn').onclick = function() {
+                var input = document.getElementsByClassName('input')
+                var tag = document.getElementsByClassName('tag')
+                
+                for(var i = 0; i < tag.length; i++){
+                    if (tag[i].value == '') {
+                        alert("빈칸을 채워주세요.")
+                        return false
+                    }
+                }
+
+                // 체크되어 있는것을 리스트에 담아서 전송
+                inputList = []
+                tagList = []
+                for (var i = 0; i < input.length; i++) {
+                    if(input[i].checked) {
+                        inputList.push(input[i].value)
+                    }
+                }
+                for (var i = 2; i < tag.length; i++) {
+                    tagList.push(tag[i].value)
+                }
+
+                document.getElementById("inputTotal").value = inputList
+                document.getElementById("inputTag").value = tagList
+
+                document.getElementById('frm').submit()
+            }
+
+            // 삭제버튼시 인풋 태그 지움
+            $(document).on("click", ".delete_btn", function(){
+                $(this).parent().parent().parent().remove()
+            })
+    	})
+
+        // 추가버튼 클릭시 인풋 태그 추가
+        function addInput() {
+            var tag = document.getElementsByClassName('tag')
+
+            if (tag.length > 6){
+                alert('더 이상 추가할 수 없습니다.')
+                return false
+            }
+
+            const prameterContainerElement = document.getElementById("prameterContainer")
+
+            var el = "<div class='new_input'><dl><dt><label for='parameter'>파라미터 </label></dt>" +
+                        "<dd><input type='text' class='tag' name='tag'>" +
+                        "<label for='text'> 텍스트 </label>" +
+                        "<input type='radio' class='input' name='input"+ imgNum +"' value='text' checked>" +
+                        "<label for='image'> 이미지 </label>" +
+                        "<input type='radio' class='input' name='input"+ imgNum +"' value='image'>" +
+                        "<button class='delete_btn'>삭제</button></dd></dl><br></div>"
+            
+            prameterContainerElement.innerHTML += el
+            imgNum += 1
+        }
+    </script>
+</html>
