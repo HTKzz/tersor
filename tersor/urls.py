@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import Model1, Model2, Model3
+from .apis import Model1, Model2, Model3
 
 urlpatterns = [
     path('api/', Model1.as_view()),

@@ -1,107 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.core.files.storage import FileSystemStorage
 from django.db import IntegrityError
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from .models import Model, Input
-from rpy2.robjects import pandas2ri
-from rpy2.robjects import conversion, default_converter
-from keras.preprocessing import image
 
 import requests
 import json
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 import base64
-import io
 import os
+
 os.environ['R_HOME'] = '/usr/lib/R'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-import rpy2.robjects as ro
-import tensorflow as tf
-
-path = '/home/init/test/tersor/templates/tensor/my_model.h5'
-path2 = '/home/init/test/tersor/templates/tensor/my_model2.h5'
-path3 = '/home/init/test/tersor/templates/tensor/my_model3.h5'
-path4 = '/home/init/test/tersor/templates/tensor/my_model4.h5'
-
-# 파일 저장 (파일을 저장할수도 있음)
-# f = request.FILES.get('imgfile')
-# fs = FileSystemStorage(location='/home/init/test/tersor/static/')
-# filename = fs.save(f.name, f)
-
-class Model1(APIView):
-    def post(self, request):
-        model = tf.keras.models.load_model(path, compile=True)
-
-        p = request.data.pop('text')
-        z = float(p)
-        x = np.arange(z-10, z+7, 1)
-
-        # 그래프 그리기 (그래프로 그리는 방법을 사용할수도 있음)
-        # plt.grid(color = "gray", alpha=.5, linestyle='--')
-
-        # plt.plot(x, model.get_weights()[0][0][0]*x+model.get_weights()[1][0], label='')
-        # plt.vlines(z, model.predict([z-10]), model.predict([z]), color="green")
-        # plt.hlines(model.predict([z]), z-10, z, color="red")
-
-        # plt.text(z, model.predict([z-10]) - 2, '%.1f' %z, ha='center', va='bottom', size = 12)
-        # plt.text(z-8, model.predict([z]), '%.5f' %model.predict([z]), ha='center', va='bottom', size = 12)
-
-        # my_stringIObytes = io.BytesIO()
-        # plt.savefig(my_stringIObytes, format='jpg')
-        # my_stringIObytes.seek(0)
-        # my_base64_jpgData = base64.b64encode(my_stringIObytes.read()).decode()
-        # plt.clf()
-
-        y = model.predict([z])
-
-        return Response({'y':y[0][0], }, status=status.HTTP_200_OK)
-
-class Model2(APIView):
-    def post(self, request):
-        model = tf.keras.models.load_model(path4, compile=True)
-
-        p = request.data.pop('text')
-        z = float(p)
-        
-        imgdata = base64.b64decode(request.data.pop('img'))
-        dataBytesIO = io.BytesIO(imgdata)
-    
-        img = image.load_img(dataBytesIO, target_size=(150, 150))
-        x = np.expand_dims(img, axis=0)
-        images = np.vstack([x])
-
-        y = model.predict(images, batch_size=10)
-
-        if y[0] > 0:
-            result = "강아지 입니다"
-        else:
-            result = "고양이 입니다"
-
-        return Response({'y':z, 'result': result}, status=status.HTTP_200_OK)
-
-class Model3(APIView):
-    def get(self, request):
-        p = request.data.pop('text')
-        z = float(p)
-
-        #r모델
-        ro.r.load('/home/init/test/tersor/templates/tensor/hi.RData')
-
-        lms = ro.r('lms')
-
-        pd_df = pd.DataFrame({'x': [z], 'x2': [z ** 2]})
-
-        with ro.conversion.localconverter(ro.default_converter + ro.pandas2ri.converter):
-            r_from_pd_df = ro.conversion.py2rpy(pd_df)
-
-        y = ro.r.predict(lms, r_from_pd_df)
-        y = np.asarray(y)
-
-        return Response({'y':y[0],}, status=status.HTTP_200_OK)
 
 # API 호출 함수
 def send_api(path, method, value, img):
@@ -140,6 +47,8 @@ def send_api(path, method, value, img):
 # 모델 리스트를 출력
 def tenList(request):
     model = list(Model.objects.all())
+
+    # html에서 index를 사용하려고 list를 enumerate형태로 변환
     model = enumerate(model)
 
     return render(request, 'tensor/model_list.html', {'models': model, })
@@ -149,6 +58,7 @@ def model_newPost(request):
     if request.method == "POST":
         model = Model()
         model.title = request.POST['title']
+        # apiName이 영어로 대소문자 구분이 안되어 소문자로 저장
         model.apiName = request.POST['apiName'].lower()
         model.content = request.POST['content']
         try:
@@ -195,6 +105,7 @@ def model_delete(request, pk):
 # 모델의 상세정보를 출력
 def model_detail(request, pk):
     model = get_object_or_404(Model, apiName=pk)
+    # 왼쪽에 모델 목록을 불러오기
     allModel = list(Input.objects.all())
     inputValue = Input.objects.filter(api_id=model.pk)[0]
     value = inputValue.value.split(',')
@@ -206,26 +117,27 @@ def tensorDetail(request, pk):
     model = get_object_or_404(Model, apiName=pk)
     allModel = list(Input.objects.all())
     inputValue = Input.objects.filter(api_id=model.pk)[0]
+    # ,를 기준으로 잘라서 리스트로 만듬
     tag = inputValue.tag.split(',')
     value = inputValue.value.split(',')
 
     if request.method == 'POST' or request.method == 'GET':
+        # 모델에 따른 정해진 api주소 호출
         if model.apiName == 'model1':
             url = "/ten/api/"
         elif model.apiName == 'model2':
             url = "/ten/api2/"
         elif model.apiName == 'model3':
             url = "/ten/api3/"
-
-        method = request.method
         
+        # 파일을 열때마다 list에 넣어줌
         f = []
         for i in range(len(tag)):
-            if method == 'GET':
+            if request.method == 'GET':
                 if value[i] == 'text':
                     x = request.GET.get(tag[i])
 
-            if method == 'POST':
+            if request.method == 'POST':
                 if value[i] == 'text':
                     x = request.POST.get(tag[i])
                 if value[i] == 'image':
@@ -234,18 +146,24 @@ def tensorDetail(request, pk):
     
         dictA = {'x': x, 'model': model, 'inputValue': inputValue}
 
+        # file.read()를 하면 다시 사용이 불가능해서 filecode안에 파일정보 담아둠
         filecode = []
         for i in range(len(f)):
             fc = f[i].file.read()
             filecode.append(fc)
+            # for문 안에서 변수선언하는 유동변수 선언
             globals()['encoded_{}'.format(i)] = base64.b64encode(filecode[i]).decode()
             dictA['encoded{}'.format(i)] = globals()['encoded_{}'.format(i)]
-    
+
+        # 파일이 없을경우 filecode에 "null"대입
         if len(filecode) == 0:
             filecode.append("null")
 
+        # API호출 (현재는 api에 이미지 코드가 들어가는건 model2에 이미지 한개밖에 없음 따라서 0번째 주소밖에
+        # 없음)
         y = send_api(url, method, x, filecode[0])
 
+        # y라는 키에 model에 따른 api호출된 결과정보를 담아줌
         if model.apiName == "model2":
             dictA['y'] = y.get('result')
         elif type(y) is str:
@@ -253,14 +171,19 @@ def tensorDetail(request, pk):
         else:
             dictA['y'] = y.get('y')
             dictA['graph'] = y.get('imgCode')
-    
+
+        # z값이 실수형 형식으로 들어오는지 확인후 다른형식이면 false반환
         try:
             z = isinstance(float(y.get('y')), float)
         except Exception as e:
             z = False
 
         dictA['z'] = z
+
+        # 이미지의 개수를 html에서 hidden값으로 사용하기위해 넣어줌
         dictA['imageAmount'] = value.count("image")
+
+        # 현재 model3엔 모든모델의 정보를 테이블 형태로 뿌려주게 되어있음
         dictA['allModel'] = allModel
 
         return render(request, 'tensor/result_form.html', dictA)
